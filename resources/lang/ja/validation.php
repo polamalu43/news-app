@@ -1,5 +1,4 @@
 <?php
-
 return [
     'required' => ':field は必須です。',
     'max'      => ':field は:max文字以内で入力してください。',

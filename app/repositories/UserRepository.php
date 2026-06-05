@@ -6,7 +6,7 @@ use Core\QueryBuilder;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository
 {
     private QueryBuilder $qb;
 
@@ -15,15 +15,13 @@ class UserRepository implements UserRepositoryInterface
         $this->qb = new QueryBuilder('users', User::class);
     }
 
-    /** 全件取得 */
-    public function findAll(): array
+    public function getLoginUser(string $email, string $password): ?User
     {
-        return $this->qb->findAll();
-    }
-
-    /** メールアドレスで1件取得 */
-    public function findById(int|string $id): ?User
-    {
-        return $this->qb->findById($id);
+        $user = $this->qb
+            ->select(['id', 'name', 'email'])
+            ->where('email', $email)
+            ->where('password', $password)
+            ->first();
+        return $user ?? null;
     }
 }

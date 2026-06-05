@@ -10,6 +10,7 @@ class QueryBuilder
     private string $modelClass;
 
     // ─── クエリ構築用プロパティ ───────────────────────────────
+    private array   $selects    = [];
     private array   $wheres    = [];
     private array   $bindings  = [];
     private ?string $orderBy   = null;
@@ -125,16 +126,25 @@ class QueryBuilder
         return $stmt->execute([$model->{$this->primaryKey}]);
     }
 
+    /** SELECT */
+    public function select(array $selects): static
+    {
+        $this->selects = $selects;
+        return $this;
+    }
+
     /** WHERE */
     public function where(string $column, mixed $operatorOrValue, mixed $value = null): static
     {
-        $this->addWhere($column, $operatorOrValue, $value, 'AND');
+        $argc = func_num_args();
+        $this->addWhere($column, $operatorOrValue, $value, 'AND', $argc);
         return $this;
     }
 
     public function orWhere(string $column, mixed $operatorOrValue, mixed $value = null): static
     {
-        $this->addWhere($column, $operatorOrValue, $value, 'OR');
+        $argc = func_num_args();
+        $this->addWhere($column, $operatorOrValue, $value, 'OR', $argc);
         return $this;
     }
 
@@ -170,7 +180,8 @@ class QueryBuilder
     /** メソッドチェーンで構築したクエリを実行して複数件取得 */
     public function get(): array
     {
-        $sql = "SELECT * FROM {$this->table}";
+        $select = !empty($this->selects) ? implode(',', $this->selects) : '*';
+        $sql = "SELECT {$select} FROM {$this->table}";
 
         if (!empty($this->wheres)) {
             $conditions = '';
@@ -198,12 +209,17 @@ class QueryBuilder
         return array_map(fn($row) => $this->modelClass::fromArray($row), $stmt->fetchAll());
     }
 
-    private function addWhere(string $column, mixed $operatorOrValue, mixed $value, string $type): void
+    private function addWhere(
+        string $column,
+        mixed $operatorOrValue,
+        mixed $value,
+        string $type,
+        int $argc
+    ): void
     {
         $column   = $this->sanitizeColumn($column);
-        $argc     = func_num_args();
-        $operator = $argc === 4 ? $operatorOrValue : '=';
-        $val      = $argc === 4 ? $value : $operatorOrValue;
+        $operator = $argc === 3 ? $operatorOrValue : '=';
+        $val      = $argc === 3 ? $value : $operatorOrValue;
 
         $this->wheres[]   = ['condition' => "{$column} {$operator} ?", 'type' => $type];
         $this->bindings[] = $val;

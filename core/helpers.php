@@ -38,3 +38,23 @@ function ensureSessionStarted(): void
         session_start();
     }
 }
+
+function lang(string $key): string
+{
+    static $messages = null;
+    if ($messages === null) {
+        $messages = require str_replace('\\', '/', BASE_PATH . '/resources/lang/ja/message.php');
+    }
+
+    $keys = explode('.', $key);
+    $value = $messages;
+    foreach ($keys as $segment) {
+        $value = $value[$segment] ?? null;
+
+        if ($value === null) {
+            return $key;
+        }
+    }
+
+    return $value;
+}

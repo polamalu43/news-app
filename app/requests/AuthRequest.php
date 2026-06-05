@@ -3,7 +3,7 @@
 namespace App\Requests;
 use Core\Request;
 
-class LoginRequest extends Request
+class AuthRequest extends Request
 {
     public function rules(): array
     {

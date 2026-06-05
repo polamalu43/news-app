@@ -12,11 +12,18 @@ abstract class Request
     public function __construct()
     {
         $data = array_merge($_GET, $_POST);
-
         $method = $_SERVER['REQUEST_METHOD'];
-        if ($method === 'PUT' || $method === 'DELETE' || $method === 'PATCH') {
-            $rawData = file_get_contents("php://input");
-            $parsedData = json_decode($rawData, true);
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        if (
+            $method === 'PUT' ||
+            $method === 'DELETE' ||
+            $method === 'PATCH' ||
+            str_contains($contentType, 'application/json')
+        ) {
+            $parsedData = json_decode(
+                file_get_contents("php://input"),
+                true
+            );
             if (is_array($parsedData)) {
                 $data = array_merge($data, $parsedData);
             }

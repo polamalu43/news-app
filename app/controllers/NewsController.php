@@ -3,8 +3,6 @@
 namespace App\Controllers;
 use Core\Controller;
 use App\Services\NewsService;
-use App\Requests\NewsRequest;
-use App\Repositories\NewsRepository;
 
 class NewsController extends Controller
 {
