@@ -13,6 +13,6 @@ class AuthService
 
     public function authenticate(string $email, string $password): ?User
     {
-        return $this->repository->getLoginUser($email, $password);
+        return $this->repository->findAuthenticatedUser($email, $password);
     }
 }

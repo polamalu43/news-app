@@ -23,13 +23,15 @@ class Container
     public static function make(string $abstract): object
     {
         // シングルトンが既に生成済みなら返す
-        if (array_key_exists($abstract, self::$singletons)) {
-            if (self::$singletons[$abstract] !== null) {
-                return self::$singletons[$abstract];
-            }
+        if (
+            array_key_exists($abstract, self::$singletons) &&
+            self::$singletons[$abstract] !== null
+        ) {
+            return self::$singletons[$abstract];
         }
 
         $factory  = self::$bindings[$abstract] ?? $abstract;
+
         $instance = $factory instanceof \Closure
             ? $factory()
             : self::resolve($factory);

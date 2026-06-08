@@ -15,13 +15,24 @@ class UserRepository
         $this->qb = new QueryBuilder('users', User::class);
     }
 
-    public function getLoginUser(string $email, string $password): ?User
+    public function findAuthenticatedUser(string $email, string $password): ?User
     {
         $user = $this->qb
-            ->select(['id', 'name', 'email'])
+            ->select(['id', 'nickname', 'email', 'password'])
             ->where('email', $email)
-            ->where('password', $password)
             ->first();
-        return $user ?? null;
+
+        if ($user === null || !password_verify($password, $user->password)) {
+            return null;
+        }
+
+        unset($user->password);
+
+        return $user;
+    }
+
+    public function registrationUser(User $user): bool
+    {
+        return $this->qb->insert($user);
     }
 }

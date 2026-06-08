@@ -11,25 +11,32 @@ abstract class Request
 
     public function __construct()
     {
+        $this->data = $this->collectRequestData();
+    }
+
+    /**
+     * HTTPリクエストから全ての入力を収集してマージする
+     */
+    private function collectRequestData(): array
+    {
         $data = array_merge($_GET, $_POST);
-        $method = $_SERVER['REQUEST_METHOD'];
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        // PUT/DELETE/PATCH または JSONリクエストの場合
         if (
-            $method === 'PUT' ||
-            $method === 'DELETE' ||
-            $method === 'PATCH' ||
+            in_array($method, ['PUT', 'DELETE', 'PATCH'], true) ||
             str_contains($contentType, 'application/json')
         ) {
-            $parsedData = json_decode(
-                file_get_contents("php://input"),
-                true
-            );
+            $rawInput = file_get_contents("php://input");
+            $parsedData = json_decode($rawInput, true);
+
             if (is_array($parsedData)) {
                 $data = array_merge($data, $parsedData);
             }
         }
 
-        $this->data = $data;
+        return $data;
     }
 
     abstract public function rules(): array;
@@ -37,15 +44,22 @@ abstract class Request
     public function validate(): bool
     {
         $this->errors = [];
-
-        foreach ($this->rules() as $field => $ruleString) {
+        $validateRules = new ValidateRules();
+        $rules = $this->rules();
+        $data = $this->data;
+        foreach ($rules as $field => $ruleString) {
             $rules = explode('|', $ruleString);
             $value = $this->data[$field] ?? null;
 
             foreach ($rules as $rule) {
                 [$ruleName, $param] = $this->parseRule($rule);
-                $validateRules = new ValidateRules();
-                $error = $validateRules->applyRule($field, $value, $ruleName, $param);
+                $error = $validateRules->applyRule(
+                    $field,
+                    $value,
+                    $ruleName,
+                    $param,
+                    $data
+                );
                 if ($error !== null) {
                     $this->errors[$field][] = $error;
                 }
@@ -62,7 +76,7 @@ abstract class Request
     }
 
     /** フィールドの値を取得 */
-    public function get(string $field, mixed $default = null): mixed
+    public function input(string $field, mixed $default = null): mixed
     {
         return $this->data[$field] ?? $default;
     }
