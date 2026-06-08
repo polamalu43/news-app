@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Controllers;
-use Core\Controller;
-use Core\Response;
 use App\Services\AuthService;
 use App\Requests\AuthRequest;
 use App\Models\User;
+use Core\Controller;
+use Core\Response;
 
 class AuthController extends Controller
 {
@@ -15,14 +15,15 @@ class AuthController extends Controller
 
     public function login(AuthRequest $request): Response
     {
+        config('newsapi.api.news_api_url');
         if (!$request->validate()) {
             return Response::json(['status' => 'error', 'errors' => $request->errors()], 422);
         }
 
         try {
             $userInfo = $this->service->authenticate(
-                $request->get('email'),
-                $request->get('password')
+                $request->input('email'),
+                $request->input('password')
             );
             if (is_null($userInfo)) {
                 return Response::json(['status' => 'error', 'message' => lang('invalid_credentials')], 401);
@@ -52,7 +53,7 @@ class AuthController extends Controller
             'authenticated' => true,
             'userInfo' => [
                 'id'    => $_SESSION['user_id'],
-                'name'  => $_SESSION['name'],
+                'nickname'  => $_SESSION['nickname'],
                 'email' => $_SESSION['email']
             ],
         ]);
@@ -60,8 +61,8 @@ class AuthController extends Controller
 
     private function storeUserSession(User $userInfo): void
     {
-        $_SESSION['user_id'] = $userInfo->id;
-        $_SESSION['name']    = $userInfo->name;
-        $_SESSION['email']   = $userInfo->email;
+        $_SESSION['user_id']     = $userInfo->id;
+        $_SESSION['nickname']    = $userInfo->nickname;
+        $_SESSION['email']       = $userInfo->email;
     }
 }

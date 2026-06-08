@@ -18,7 +18,15 @@ function env(string $key, mixed $default = null): mixed
 
 function dd(mixed ...$vars): never
 {
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+    $file = $trace['file'];
+    $line = $trace['line'];
+
     echo '<pre style="background:#000; color:#fff; padding:16px; border-radius:8px; font-size:14px;">';
+    // ファイルと行番号を表示
+    echo '<div style="margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; color: #ffeb3b;">';
+    echo "DEBUG: {$file} (line {$line})";
+    echo '</div>';
     foreach ($vars as $var) {
         ob_start();
         var_dump($var);
@@ -39,7 +47,7 @@ function ensureSessionStarted(): void
     }
 }
 
-function lang(string $key): string
+function lang(string $key, $default = null): ?string
 {
     static $messages = null;
     if ($messages === null) {
@@ -52,7 +60,37 @@ function lang(string $key): string
         $value = $value[$segment] ?? null;
 
         if ($value === null) {
-            return $key;
+            return $default;
+        }
+    }
+
+    return $value;
+}
+
+function config(string $key, $default = null): ?string
+{
+    static $configs = null;
+    if ($configs === null) {
+        $configs = [];
+        $dir = BASE_PATH . '/config/';
+        if (is_dir($dir)) {
+            $files = scandir($dir);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+                $keyName = pathinfo($file, PATHINFO_FILENAME);
+                $configs[$keyName] = require str_replace('\\', '/', $dir . $file);
+            }
+        }
+    }
+
+    $keys = explode('.', $key);
+    $value = $configs;
+    foreach ($keys as $segment) {
+        $value = $value[$segment] ?? null;
+        if ($value === null) {
+            return $default;
         }
     }
 

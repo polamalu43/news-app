@@ -88,14 +88,12 @@ class QueryBuilder
         $fields = array_keys($data);
         $columns = implode(', ', $fields);
 
-        // プレースホルダーの生成 (?, ?, ?), (?, ?, ?) ...
         $rowPlaceholder = '(' . implode(', ', array_fill(0, count($fields), '?')) . ')';
         $placeholders = implode(', ', array_fill(0, count($models), $rowPlaceholder));
 
         $ignore = $isIgnore ? 'IGNORE' : '';
         $sql = "INSERT {$ignore} INTO {$this->table} ({$columns}) VALUES {$placeholders}";
 
-        // 値のフラットな配列を作成
         $values = [];
         foreach ($models as $model) {
             $values = array_merge($values, array_values($model->toArray()));
@@ -177,7 +175,9 @@ class QueryBuilder
         return $this;
     }
 
-    /** メソッドチェーンで構築したクエリを実行して複数件取得 */
+    /**
+     * @return object[]
+     */
     public function get(): array
     {
         $select = !empty($this->selects) ? implode(',', $this->selects) : '*';
@@ -234,7 +234,9 @@ class QueryBuilder
         $this->limit     = null;
     }
 
-    /** メソッドチェーンで構築したクエリを実行して1件取得 */
+    /**
+     * @return object|null
+     */
     public function first(): ?object
     {
         $this->limit(1);

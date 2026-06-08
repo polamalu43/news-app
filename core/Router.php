@@ -131,8 +131,8 @@ class Router
     private function buildPattern(string $path): string
     {
         // {id}      → 必須パラメータ
-        // {id?}     → 任意パラメータ
         $pattern = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $path);
+        // {id?}     → 任意パラメータ
         $pattern = preg_replace('/\{([a-zA-Z_]+)\?\}/', '(?P<$1>[^/]*)?', $pattern);
         return '#^' . $pattern . '$#';
     }
