@@ -22,7 +22,7 @@ function dd(mixed ...$vars): never
     $file = $trace['file'];
     $line = $trace['line'];
 
-    echo '<pre style="background:#000; color:#fff; padding:16px; border-radius:8px; font-size:14px;">';
+    echo '<pre style="background:#000; color:#fff; padding:16px; border-radius:8px; font-size:14px; white-space:pre-wrap; word-wrap:break-word;">';
     // ファイルと行番号を表示
     echo '<div style="margin-bottom: 10px; border-bottom: 1px solid #444; padding-bottom: 5px; color: #ffeb3b;">';
     echo "DEBUG: {$file} (line {$line})";
@@ -67,7 +67,7 @@ function lang(string $key, $default = null): ?string
     return $value;
 }
 
-function config(string $key, $default = null): ?string
+function config(string $key, $default = null): string | array | null
 {
     static $configs = null;
     if ($configs === null) {

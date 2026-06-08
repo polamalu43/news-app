@@ -5,7 +5,7 @@ use Core\Router;
 $router = Router::getInstance();
 
 $router->get('/api/news', ['App\Controllers\NewsController', 'index']);
-$router->post('/api/news', ['App\Controllers\NewsController', 'sync']);
+$router->post('/api/news/store', ['App\Controllers\NewsController', 'store']);
 $router->get('/api/mypage', ['App\Controllers\MypageController', 'index']);
 $router->post('/api/auth/login', ['App\Controllers\AuthController', 'login']);
 $router->post('/api/auth/me', ['App\Controllers\AuthController', 'me']);

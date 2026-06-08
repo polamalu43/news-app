@@ -31,10 +31,8 @@ class AuthController extends Controller
             session_regenerate_id(true);
             $this->storeUserSession($userInfo);
 
-            // 成功時のJSONレスポンス
             return Response::json(['status' => 'success'], 200);
         } catch (\Exception $e) {
-            // エラー時のJSONレスポンス
             return Response::json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
