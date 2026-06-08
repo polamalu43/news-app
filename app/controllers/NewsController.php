@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use Core\Controller;
+use Core\Response;
 use App\Services\NewsService;
 
 class NewsController extends Controller
@@ -10,35 +11,35 @@ class NewsController extends Controller
         private NewsService $service
     ) {}
 
-    public function index(): void
+    public function index(): Response
     {
         try {
-            // 成功時のJSONレスポンス
-            header('Content-Type: application/json');
-            echo json_encode([
+            return Response::json([
                 'status' => 'success',
                 'data' => $this->service->getNewsList()
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-            // エラー時のJSONレスポンス
-            header('Content-Type: application/json', true, 500);
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            return Response::json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function sync(): void
+    public function store(): Response
     {
         try {
-            $this->service->fetchQiitaNews();
+            $newsList = $this->service->fetchNews(1, 1, 1);
+            $result = $this->service->insertNews($newsList);
 
-            // 成功時のJSONレスポンス
-            header('Content-Type: application/json');
-            echo json_encode(['status' => 'success']);
+            if (!$result) {
+                return Response::json(['status' => 'error', 'message' => 'Failed to save news'], 500);
+            }
 
+            return Response::json(['status' => 'success'], 200);
+        } catch (\InvalidArgumentException $e) {
+            return Response::json(['status' => 'error', 'message' => $e->getMessage()], 400);
+        } catch (\RuntimeException $e) {
+            return Response::json(['status' => 'error', 'message' => $e->getMessage()], 502);
         } catch (\Exception $e) {
-            // エラー時のJSONレスポンス
-            header('Content-Type: application/json', true, 500);
-            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+            return Response::json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 }
