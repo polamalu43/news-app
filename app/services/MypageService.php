@@ -10,10 +10,10 @@ class MypageService
 {
     public function __construct(
         private UserRepository $userRepository,
-        private FavoriteRepository $favoriteRepository,
+        private FavoriteRepository $favoriteRepository
     ) {}
 
-    public function findById(int $userId): ?User
+    public function findUserById(int $userId): ?User
     {
         return $this->userRepository->findById($userId, ['id', 'nickname', 'email']);
     }

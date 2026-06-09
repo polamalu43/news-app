@@ -201,4 +201,19 @@ class Router
             $response->send();
         }
     }
+
+    public function group(array $options, callable $callback): void
+    {
+        $previousPrefix      = $this->prefix;
+        $previousMiddlewares = $this->middlewares;
+
+        $this->prefix      = $previousPrefix . ($options['prefix'] ?? '');
+        $this->middlewares = array_merge($this->middlewares, $options['middleware'] ?? []);
+
+        $callback($this);
+
+        // グループを抜けたら元に戻す
+        $this->prefix      = $previousPrefix;
+        $this->middlewares = $previousMiddlewares;
+    }
 }

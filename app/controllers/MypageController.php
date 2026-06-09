@@ -2,8 +2,6 @@
 
 namespace App\Controllers;
 use App\Services\MypageService;
-use App\Requests\MypageRequest;
-use App\Models\User;
 use Core\Controller;
 use Core\Response;
 
@@ -16,7 +14,7 @@ class MypageController extends Controller
     public function index(int $userId): Response
     {
         try {
-            $user = $this->service->findById($userId)->toArray();
+            $user = $this->service->findUserById($userId)->toArray();
             $favoriteList = $this->service->getFavoriteList($userId);
 
             return Response::json([
