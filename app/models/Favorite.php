@@ -6,5 +6,5 @@ use Core\Model;
 
 class Favorite extends Model
 {
-    protected static string $table = 'favorites';
+    public static string $table = 'favorites';
 }

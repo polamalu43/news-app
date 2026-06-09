@@ -119,10 +119,22 @@ class QueryBuilder
     }
 
     /** 削除 */
-    public function delete(Model $model): bool
+    public function delete(string $table, array $conditions): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE {$this->primaryKey} = ?");
-        return $stmt->execute([$model->{$this->primaryKey}]);
+        if (empty($conditions)) {
+            return false;
+        }
+
+        $where = [];
+        $values = [];
+        foreach ($conditions as $column => $value) {
+            $where[] = "{$column} = ?";
+            $values[] = $value;
+        }
+        $sql = "DELETE FROM {$table} WHERE " . implode(' AND ', $where);
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute($values);
     }
 
     /** SELECT */
