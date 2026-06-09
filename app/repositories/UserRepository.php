@@ -15,6 +15,11 @@ class UserRepository
         $this->qb = new QueryBuilder('users', User::class);
     }
 
+    public function findById(int $userId, array $selects = []): ?User
+    {
+        return $this->qb->findById($userId, $selects);
+    }
+
     public function findAuthenticatedUser(string $email, string $password): ?User
     {
         $user = $this->qb

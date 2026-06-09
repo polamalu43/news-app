@@ -26,7 +26,7 @@ class NewsController extends Controller
     public function store(): Response
     {
         try {
-            $newsList = $this->service->fetchNews(1, 1, 1);
+            $newsList = $this->service->fetchNews(1, 1, 5);
             $result = $this->service->insertNews($newsList);
 
             if (!$result) {

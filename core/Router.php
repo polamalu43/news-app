@@ -57,12 +57,14 @@ class Router
         }
 
         foreach ($this->routes as $route) {
-            if ($route['method'] !== $method) {
+            if (
+                $route['method'] !== $method ||
+                preg_match($route['pattern'], $uri) !== 1
+            ) {
                 continue;
             }
 
             $params = $this->matchRoute($route['pattern'], $uri);
-
             if ($params === null) {
                 continue;
             }
@@ -130,10 +132,7 @@ class Router
     /** パスを正規表現パターンへ変換 */
     private function buildPattern(string $path): string
     {
-        // {id}      → 必須パラメータ
         $pattern = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $path);
-        // {id?}     → 任意パラメータ
-        $pattern = preg_replace('/\{([a-zA-Z_]+)\?\}/', '(?P<$1>[^/]*)?', $pattern);
         return '#^' . $pattern . '$#';
     }
 

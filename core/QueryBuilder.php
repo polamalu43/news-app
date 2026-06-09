@@ -37,9 +37,10 @@ class QueryBuilder
     }
 
     /** 主キーで1件取得 */
-    public function findById(int|string $id): ?Model
+    public function findById(int|string $id, array $selects = []): ?Model
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE {$this->primaryKey} = ?");
+        $select = empty($selects) ? '*' : implode(',', $selects);
+        $stmt = $this->db->prepare("SELECT $select FROM {$this->table} WHERE {$this->primaryKey} = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         return $row ? $this->modelClass::fromArray($row) : null;

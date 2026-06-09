@@ -21,6 +21,6 @@ class NewsRepository
 
     public function bulkInsert(array $data): bool
     {
-        return $this->qb->bulkInsert($data);
+        return $this->qb->bulkInsert($data, true);
     }
 }
