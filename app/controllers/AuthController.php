@@ -57,6 +57,28 @@ class AuthController extends Controller
         ]);
     }
 
+    public function logout(): Response
+    {
+        $_SESSION = [];
+
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+
+        session_destroy();
+
+        return Response::json(['status' => 'success'], 200);
+    }
+
     private function storeUserSession(User $userInfo): void
     {
         $_SESSION['user_id']     = $userInfo->id;

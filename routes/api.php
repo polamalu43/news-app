@@ -4,11 +4,12 @@ use Core\Router;
 
 $router = Router::getInstance();
 
-$router->get('/api/news',               ['App\Controllers\NewsController', 'index']);
-$router->post('/api/news/store',        ['App\Controllers\NewsController', 'store']);
-$router->post('/api/auth/login',        ['App\Controllers\AuthController', 'login']);
-$router->post('/api/register/confirm',  ['App\Controllers\RegistrationController', 'confirm']);
-$router->post('/api/register/complete', ['App\Controllers\RegistrationController', 'complete']);
+$router->get('/api/news',                ['App\Controllers\NewsController', 'index']);
+$router->post('/api/news/store',         ['App\Controllers\NewsController', 'store']);
+$router->post('/api/auth/login',         ['App\Controllers\AuthController', 'login']);
+$router->post('/api/auth/logout',        ['App\Controllers\AuthController', 'logout']);
+$router->post('/api/register/confirm',   ['App\Controllers\RegistrationController', 'confirm']);
+$router->post('/api/register/complete',  ['App\Controllers\RegistrationController', 'complete']);
 
 $router->group(['middleware' => ['App\Middlewares\AuthMiddleware']], function ($router) {
     $router->get('/api/mypage/{userId}', ['App\Controllers\MypageController', 'index']);
